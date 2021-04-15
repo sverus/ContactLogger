@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using ContactLogger.Data.Entities;
+
 using ContactLogger.Models;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,13 @@ namespace ContactLogger.Data
     {
         public ContactProfile()
         {
-            this.CreateMap<Student, StudentModel>();
+            this.CreateMap<Student, StudentModel>()
+                .ReverseMap();
+            //.ForMember(t => t.Contacts, opt => opt.Ignore());
+            this.CreateMap<ContactLog, ContactLogModel>()
+                .ReverseMap()
+             .ForMember(t => t.Student, opt => opt.Ignore());
+            
         }
     }
 }

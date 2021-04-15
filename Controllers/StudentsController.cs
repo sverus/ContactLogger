@@ -18,15 +18,15 @@ namespace ContactLogger.Controllers
     {
         private readonly IContactRepository _repository;
         private readonly IMapper _mapper;
-        // private readonly LinkGenerator _linkGenerator;
+        private readonly LinkGenerator _linkGenerator;
 
 
-        //, LinkGenerator linkGenerator
-        public StudentsController(IContactRepository repository, IMapper mapper)
+        
+        public StudentsController(IContactRepository repository, IMapper mapper, LinkGenerator linkGenerator)
         {
             _repository = repository;
             _mapper = mapper;
-           // _linkGenerator = linkGenerator;
+            _linkGenerator = linkGenerator;
         }
 
         [HttpGet]
@@ -44,6 +44,100 @@ namespace ContactLogger.Controllers
                 return this.StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
 
+        }
+
+        [HttpGet("{moniker}")]
+        public async Task<ActionResult<StudentModel>> Get(string moniker)
+        {
+            try
+            {
+                var result = await _repository.GetStudentAsync(moniker);
+                if (result == null) return NotFound();
+
+                return _mapper.Map<StudentModel>(result);
+            }
+            catch (Exception)
+            {
+
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
+            }
+
+        }
+
+        public async Task<ActionResult<StudentModel>> Post(StudentModel model)
+        {
+            try
+            {
+                var existing = await _repository.GetStudentAsync(model.Moniker);
+                if (existing != null)
+                {
+                    return BadRequest("Moniker in use.");
+                }
+                var location = _linkGenerator.GetPathByAction("Get", "Students", new { moniker = model.Moniker });
+                if (string.IsNullOrWhiteSpace(location))
+                {
+                    return BadRequest("Could not use moniker.");
+                }
+                var student = _mapper.Map<Student>(model);
+                _repository.Add(student);
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Created($"/api/students/{student.Moniker}", _mapper.Map<StudentModel>(student));
+                }
+            }
+            catch (Exception ex)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, ex);
+            }
+            return BadRequest();
+        }
+
+        [HttpPut("{moniker}")]
+        public async Task<ActionResult<StudentModel>> Put(string moniker, StudentModel model)
+        {
+            try
+            {
+                var oldStudent = await _repository.GetStudentAsync(moniker);
+                if (oldStudent == null)
+                {
+                    return NotFound($"Student does not exist with moniker of {moniker}.");
+                }
+                _mapper.Map(model, oldStudent);
+
+                if (await _repository.SaveChangesAsync())
+                {
+                    return _mapper.Map<StudentModel>(oldStudent);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return this.StatusCode(StatusCodes.Status500InternalServerError, ex);
+            }
+            return BadRequest();
+        }
+        [HttpDelete("{moniker}")]
+        public async Task<IActionResult> Delete(string moniker)
+        {
+            try
+            {
+                var student = await _repository.GetStudentAsync(moniker);
+                if (student == null)
+                {
+                    return NotFound($"Student does not exist with moniker of {moniker}.");
+                }
+                _repository.Delete(student);
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return this.StatusCode(StatusCodes.Status500InternalServerError, ex);
+            }
+            return BadRequest("Failed to delete the student.");
         }
     }
 }

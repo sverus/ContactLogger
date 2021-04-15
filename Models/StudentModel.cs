@@ -1,4 +1,5 @@
-﻿using ContactLogger.Data.Entities;
+﻿
+using ContactLogger.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,6 @@ namespace ContactLogger.Models
         public string Moniker { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public ICollection<ContactLog> Contacts { get; set; }
+        public ICollection<ContactLogModel> Contacts { get; set; }
     }
 }

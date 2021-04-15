@@ -1,4 +1,4 @@
-﻿using ContactLogger.Data.Entities;
+﻿
 using System.Threading.Tasks;
 
 namespace ContactLogger.Data
@@ -9,7 +9,8 @@ namespace ContactLogger.Data
         void Delete<T>(T entity) where T : class;
         Task<Student[]> GetAllStudentsAsync(bool includeContacts = false);
         Task<ContactLog[]> GetContactsByMonikerAsync(string moniker);
-        Task<Student> GetStudentAsync(string moniker, bool includeContacts);
+        Task<ContactLog> GetContactByMonikerAsync(string moniker, int id);
+        Task<Student> GetStudentAsync(string moniker, bool includeContacts = false);
         Task<bool> SaveChangesAsync();
     }
 }
