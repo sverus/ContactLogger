@@ -35,7 +35,6 @@ namespace ContactLogger.Data
         public async Task<bool> SaveChangesAsync()
         {
             _logger.LogInformation($"Attempting to save the changes in the context");
-
             // Only return success if at least one row was changed
             return (await _context.SaveChangesAsync()) > 0;
         }
@@ -43,27 +42,19 @@ namespace ContactLogger.Data
         public async Task<Student[]> GetAllStudentsAsync(bool includeContacts = false)
         {
             _logger.LogInformation($"Getting all Students");
-
             IQueryable<Student> query = _context.Students;
-
-
             if (includeContacts)
             {
                 query = query
                   .Include(c => c.Contacts);
             }
-
             return await query.ToArrayAsync();
         }
 
         public async Task<Student> GetStudentAsync(string moniker, bool includeContacts = false)
         {
             _logger.LogInformation($"Getting a Student for {moniker}");
-
             IQueryable<Student> query = _context.Students;
-
-            //query = query.Where(c => c.Moniker == moniker);
-
             if (includeContacts)
             {
                 query = query
@@ -71,35 +62,25 @@ namespace ContactLogger.Data
             }
             // Query It
             query = query.Where(c => c.Moniker == moniker);
-
             return await query.FirstOrDefaultAsync();
         }
 
         public async Task<ContactLog[]> GetContactsByMonikerAsync(string moniker)
         {
             _logger.LogInformation($"Getting all Contacts for a Student");
-
             IQueryable<ContactLog> query = _context.ContactLogs;
-
             query = query
             .Where(t => t.Student.Moniker == moniker);
-
             return await query.ToArrayAsync();
-
         }
 
         public async Task<ContactLog> GetContactByMonikerAsync(string moniker, int Id)
         {
             _logger.LogInformation($"Getting single Contact for a Student");
-
             IQueryable<ContactLog> query = _context.ContactLogs;
-
             query = query
   .Where(t => t.Id == Id && t.Student.Moniker == moniker);
-
             return await query.FirstOrDefaultAsync();
         }
-
-
     }
 }

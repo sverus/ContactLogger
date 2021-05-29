@@ -40,7 +40,6 @@ namespace ContactLogger.Controllers
             }
             catch (Exception ex)
             {
-
                 return this.StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
         }
@@ -52,12 +51,10 @@ namespace ContactLogger.Controllers
             {
                 var contact = await _repository.GetContactByMonikerAsync(moniker, id);
                 if (contact == null) return NotFound("Contact not found.");
-
                 return _mapper.Map<ContactLogModel>(contact);
             }
             catch (Exception ex)
             {
-
                 return this.StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
         }
@@ -69,20 +66,14 @@ namespace ContactLogger.Controllers
             {
                 var student = await _repository.GetStudentAsync(moniker);
                 if (student == null) return BadRequest("Student not found.");
-
                 var contact = _mapper.Map<ContactLog>(model);
-                contact.Student = student;
-
-                
-
+                contact.Student = student;               
                 _repository.Add(contact);
 
                 if (await _repository.SaveChangesAsync())
                 {
                     var url = _linkGenerator.GetPathByAction(HttpContext, "Get", values:
                         new { moniker, id = contact.Id });
-
-
                     return Created(url, _mapper.Map<ContactLogModel>(contact));
                 }
                 else
@@ -92,7 +83,6 @@ namespace ContactLogger.Controllers
             }
             catch (Exception ex)
             {
-
                 return this.StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
         }
@@ -104,11 +94,7 @@ namespace ContactLogger.Controllers
             {
                 var contact = await _repository.GetContactByMonikerAsync(moniker, id);
                 if (contact == null) return NotFound("Could not find contact");
-
-
-
                 _mapper.Map(model, contact);
-
                 if (await _repository.SaveChangesAsync())
                 {
                     return _mapper.Map<ContactLogModel>(contact);
@@ -120,7 +106,6 @@ namespace ContactLogger.Controllers
             }
             catch (Exception ex)
             {
-
                 return this.StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
         }
@@ -131,13 +116,11 @@ namespace ContactLogger.Controllers
             {
                 var talk = await _repository.GetContactByMonikerAsync(moniker, id);
                 if (talk == null) return NotFound("Could not find contact");
-
                 _repository.Delete(talk);
                 if (await _repository.SaveChangesAsync())
                 {
                     return Ok();
                 }
-
                 else
                 {
                     return BadRequest("Failed to delete the contact.");
@@ -151,5 +134,4 @@ namespace ContactLogger.Controllers
 
         }
     }
-
 }

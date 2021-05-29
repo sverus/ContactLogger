@@ -20,8 +20,6 @@ namespace ContactLogger.Controllers
         private readonly IMapper _mapper;
         private readonly LinkGenerator _linkGenerator;
 
-
-        
         public StudentsController(IContactRepository repository, IMapper mapper, LinkGenerator linkGenerator)
         {
             _repository = repository;
@@ -35,15 +33,12 @@ namespace ContactLogger.Controllers
             try
             {
                 var results = await _repository.GetAllStudentsAsync(includeContacts);
-
                 return _mapper.Map<StudentModel[]>(results);
             }
             catch (Exception ex)
             {
-
                 return this.StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
-
         }
 
         [HttpGet("{moniker}")]
@@ -53,15 +48,12 @@ namespace ContactLogger.Controllers
             {
                 var result = await _repository.GetStudentAsync(moniker);
                 if (result == null) return NotFound();
-
                 return _mapper.Map<StudentModel>(result);
             }
             catch (Exception)
             {
-
                 return this.StatusCode(StatusCodes.Status500InternalServerError, "Database Failure");
             }
-
         }
 
         public async Task<ActionResult<StudentModel>> Post(StudentModel model)
@@ -103,7 +95,6 @@ namespace ContactLogger.Controllers
                     return NotFound($"Student does not exist with moniker of {moniker}.");
                 }
                 _mapper.Map(model, oldStudent);
-
                 if (await _repository.SaveChangesAsync())
                 {
                     return _mapper.Map<StudentModel>(oldStudent);
@@ -111,7 +102,6 @@ namespace ContactLogger.Controllers
             }
             catch (Exception ex)
             {
-
                 return this.StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
             return BadRequest();
